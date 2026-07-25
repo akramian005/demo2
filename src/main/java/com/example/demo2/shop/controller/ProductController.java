@@ -1,5 +1,6 @@
 package com.example.demo2.shop.controller;
 
+import com.example.demo2.shop.dto.ProductUpdateDto;
 import com.example.demo2.shop.entity.Product;
 import com.example.demo2.shop.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.createProduct(product));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    @PatchMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDto dto) {
+        return ResponseEntity.ok(productService.updateProduct(id, dto));
     }
 
     @DeleteMapping("/{id}")

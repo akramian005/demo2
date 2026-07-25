@@ -1,5 +1,6 @@
 package com.example.demo2.shop.service;
 
+import com.example.demo2.shop.dto.ProductUpdateDto;
 import com.example.demo2.shop.entity.Category;
 import com.example.demo2.shop.entity.Product;
 import com.example.demo2.shop.repository.CategoryRepository;
@@ -31,18 +32,30 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product updateProduct(Long id, Product updated) {
+    public Product updateProduct(Long id, ProductUpdateDto dto) {
         Product product = getProductById(id);
-        product.setName(updated.getName());
-        product.setBrand(updated.getBrand());
-        product.setDescription(updated.getDescription());
-        product.setPrice(updated.getPrice());
-        product.setStock(updated.getStock());
-        if (updated.getCategory() != null) {
-            Category category = categoryRepository.findById(updated.getCategory().getId())
+        
+        if (dto.getName() != null) {
+            product.setName(dto.getName());
+        }
+        if (dto.getBrand() != null) {
+            product.setBrand(dto.getBrand());
+        }
+        if (dto.getDescription() != null) {
+            product.setDescription(dto.getDescription());
+        }
+        if (dto.getPrice() != null) {
+            product.setPrice(dto.getPrice());
+        }
+        if (dto.getStock() != null) {
+            product.setStock(dto.getStock());
+        }
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Категория не найдена"));
             product.setCategory(category);
         }
+        
         return productRepository.save(product);
     }
 

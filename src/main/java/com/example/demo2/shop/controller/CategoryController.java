@@ -1,5 +1,6 @@
 package com.example.demo2.shop.controller;
 
+import com.example.demo2.shop.dto.CategoryUpdateDto;
 import com.example.demo2.shop.entity.Category;
 import com.example.demo2.shop.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> createCategory(@PathVariable Long id) {
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
@@ -30,9 +31,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.createCategory(category));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, category));
+    @PatchMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateDto dto) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, dto));
     }
 
     @DeleteMapping("/{id}")

@@ -1,0 +1,109 @@
+
+com.example.demo2
+banking
+.	application
+.	.	command
+.	.	.	TransferMoneyCommand
+.	.	listener
+.	.	.	BankingUserRegisteredListener
+.	.	result
+.	.	.	MoneyTransferResult
+.	.	service
+.	.	.	AccountQueryService
+.	.	.	IbanGenerationService
+.	.	.	MoneyTransferService
+.	.	.	OpenAccountService
+.	domain
+.	.	exception
+.	.	.	AccountNotActiveException
+.	.	.	CardNotUsableException
+.	.	.	CurrencyMismatchException
+.	.	.	InsufficientFundsException
+.	.	.	InvalidAmountException
+.	.	model
+.	.	.	AccountStatus
+.	.	.	BankAccount
+.	.	.	CardStatus
+.	.	.	Iban
+.	.	.	PaymentCard
+.	.	repository
+.	.	.	BankAccountRepository
+.	infrastructure.persistence
+.	.	jpa
+.	.	.		SpringDataBankAccountRepository
+.	.	BankAccountRepositoryImpl
+.	presentation
+.	.	controller
+.	.	.	BankController
+.	.	dto
+.	.	.	AccountCheckResponse
+.	.	.	AccountResponse
+.	.	.	MoneyTransferRequest
+.	.	.	MoneyTransferResponse
+identity
+.	controller
+.	.	AuthController
+.	dto
+.	.	AuthResponse
+.	.	LoginRequest
+.	.	RegisterRequest
+.	entity
+.	.	User
+.	.	Role
+.	repository
+.	.	UserRepository
+.	service
+.	.	AuthService
+.	.	CustomUserDetailService
+.	.	UserQueryService
+shared
+.	event
+.	.	UserRegisteredEvent
+.	security
+.	.	filter
+.	.	.	JwtFilter
+.	.	JwtService
+.	.	SecurityConfig
+shop
+.	controller
+.	.	CartController
+.	.	CategoryController
+.	.	OrderController
+.	.	ProductController
+.	dto
+.	.	cart
+.	.	.	AddToCartRequest
+.	.	.	CartItemResponse
+.	.	.	UpdateCartItemRequest
+.	.	order
+.	.	.	AddressRequest
+.	.	.	CreateOrderRequest
+.	.	.	OrderItemResponse
+.	.	.	OrderResponse
+.	.	.	UpdateOrderStatusRequest
+.	entity
+.	.	Address
+.	.	CartItem
+.	.	Category
+.	.	Customer
+.	.	Order
+.	.	OrderItem
+.	.	OrderStatus
+.	.	Product
+.	initializer
+.	.	AdminUserInitializer
+.	.	CategoryProductInitializer
+.	listener
+.	.	ShopUserRegisteredListener
+.	repository
+.	.	CartItemRepository
+.	.	CategoryRepository
+.	.	CustomerRepository
+.	.	OrderRepository
+.	.	ProductRepository
+.	service
+.	.	CartService
+.	.	CategoryService
+.	.	OrderService
+.	.	ProductService
+Demo2Application

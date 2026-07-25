@@ -22,9 +22,6 @@ public class Customer {
     @Column(name = "user_id", nullable = false, unique = true)
     private Long userId;
 
-    @Column(name = "phone")
-    private String phone;
-
     @Builder.Default
     @Column(name = "bonus_points")
     private Integer bonusPoints = 0;

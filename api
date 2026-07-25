@@ -1,0 +1,110 @@
+Content-Type: application/json
+
+GET
+http://localhost:8080/api/products
+
+GET
+http://localhost:8080/api/products/1
+
+POST
+http://localhost:8080/api/products
+{
+  "name": "Мышь Wireless Pro",
+  "brand": "Logitech",
+  "description": "Беспроводная игровая мышь с оптическим сенсором",
+  "price": 4500.50,
+  "stock": 25,
+  "category": {
+    "id": 1
+  }
+}
+
+PATCH
+http://localhost:8080/api/products/1
+{
+  "name": "Мышь Wireless Pro Superlight",
+  "brand": "Logitech",
+  "description": "Обновленная ультралегкая версия",
+  "price": 5200.00,
+  "stock": 18,
+  "categoryId": 1
+}
+
+DELETE
+http://localhost:8080/api/products/1
+
+CATEGORY==================================================
+
+GET
+http://localhost:8080/api/categories
+
+GET
+http://localhost:8080/api/categories/1
+
+POST
+http://localhost:8080/api/categories
+{
+  "name": "Периферия и аксессуары"
+}
+
+PUT
+http://localhost:8080/api/categories/1
+{
+  "name": "Компьютерная периферия"
+}
+
+DELETE
+http://localhost:8080/api/categories/1
+
+CART==================================================
+
+GET
+http://localhost:8080/api/cart
+
+POST
+http://localhost:8080/api/cart
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+PATCH
+http://localhost:8080/api/cart/1
+{
+  "quantity": 5
+}
+
+DELETE
+http://localhost:8080/api/cart/1
+
+DELETE
+http://localhost:8080/api/cart
+
+
+ORDER==================================================
+
+POST
+http://localhost:8080/api/orders
+{
+  "shippingAddress": {
+    "country": "Кыргызстан",
+    "city": "Бишкек",
+    "street": "проспект Чуй, 255, кв. 12",
+    "postalCode": "720001"
+  }
+}
+
+GET
+http://localhost:8080/api/orders
+
+GET
+http://localhost:8080/api/orders/1
+
+PATCH
+http://localhost:8080/api/orders/1/status
+{
+  "status": "PROCESSING"
+}
+
+GET
+http://localhost:8080/api/orders/all

@@ -26,8 +26,7 @@ public class OpenAccountService {
 
         BankAccount account = BankAccount.open(userId, accountNumber, iban.getValue(), currency);
 
-        // Сразу выпускаем карту к новому счёту — как это обычно происходит
-        // при открытии счёта физлицу в банке
+        //Выпуск новой карты
         String cardholderName = userQueryService.getFullName(userId);
         String fullCardNumber = generateCardNumber();
         PaymentCard card = PaymentCard.issue(fullCardNumber, cardholderName, LocalDate.now().plusYears(4));

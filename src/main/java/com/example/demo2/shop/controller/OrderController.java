@@ -25,7 +25,7 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateOrderRequest request
     ) {
-        return ResponseEntity.ok(orderService.createOrder(user.getId(), request));
+        return ResponseEntity.ok(orderService.createOrder(user, request));
     }
 
     @GetMapping

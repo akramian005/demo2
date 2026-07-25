@@ -1,5 +1,6 @@
 package com.example.demo2.shop.service;
 
+import com.example.demo2.shop.dto.CategoryUpdateDto;
 import com.example.demo2.shop.entity.Category;
 import com.example.demo2.shop.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,13 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    public Category updateCategory(Long id, Category updated) {
+    public Category updateCategory(Long id, CategoryUpdateDto dto) {
         Category category = getCategoryById(id);
-        category.setName(updated.getName());
+        
+        if (dto.getName() != null) {
+            category.setName(dto.getName());
+        }
+        
         return categoryRepository.save(category);
     }
 

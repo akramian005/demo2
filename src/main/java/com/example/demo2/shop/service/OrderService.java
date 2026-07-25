@@ -8,6 +8,7 @@ import com.example.demo2.shop.entity.*;
 import com.example.demo2.shop.repository.CartItemRepository;
 import com.example.demo2.shop.repository.OrderRepository;
 import com.example.demo2.shop.repository.ProductRepository;
+import com.example.demo2.identity.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,15 +26,16 @@ public class OrderService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public OrderResponse createOrder(Long userId, CreateOrderRequest request) {
-        List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
+    public OrderResponse createOrder(User user, CreateOrderRequest request) {
+        List<CartItem> cartItems = cartItemRepository.findByUserId(user.getId());
 
         if (cartItems.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Корзина пуста");
         }
 
         Order order = new Order();
-        order.setUserId(userId);
+        order.setUserId(user.getId());
+        order.setPhone(user.getPhone());
         order.setShippingAddress(toAddressEntity(request.getShippingAddress()));
 
         for (CartItem cartItem : cartItems) {
@@ -59,7 +61,7 @@ public class OrderService {
         order.recalculateTotalPrice();
         Order saved = orderRepository.save(order);
 
-        cartItemRepository.deleteByUserId(userId);
+        cartItemRepository.deleteByUserId(user.getId());
 
         return toResponse(saved);
     }

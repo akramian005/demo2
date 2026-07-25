@@ -35,6 +35,9 @@ public class Order {
     @Embedded
     private Address shippingAddress;
 
+    @Column(name = "phone")
+    private String phone;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
