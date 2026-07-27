@@ -1,8 +1,6 @@
 package com.example.demo2.identity.service;
 
-import com.example.demo2.identity.dto.AuthResponse;
-import com.example.demo2.identity.dto.LoginRequest;
-import com.example.demo2.identity.dto.RegisterRequest;
+import com.example.demo2.identity.dto.*;
 import com.example.demo2.identity.entity.Role;
 import com.example.demo2.identity.entity.User;
 import com.example.demo2.identity.repository.UserRepository;
@@ -72,6 +70,29 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
         return new AuthResponse(token, user.getEmail(), user.getRole().name());
+    }
+
+    public AdminUserResponse createUserByAdmin(AdminCreateUserRequest request) {
+        String email = normalizeEmail(request.getEmail());
+
+        if (userRepository.existsByEmail(email)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
+        }
+
+        User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole() != null ? request.getRole() : Role.USER);
+        userRepository.save(user);
+
+        // Тот же ивент, что и при self-service регистрации —
+        // shop и account узнают о новом пользователе одинаково,
+        // независимо от того, кто его создал.
+        eventPublisher.publishEvent(new UserRegisteredEvent(user.getId(), user.getEmail()));
+
+        return new AdminUserResponse(user.getId(), user.getEmail(), user.getRole().name());
     }
 
     private String normalizeEmail(String email) {

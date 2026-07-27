@@ -1,5 +1,6 @@
 package com.example.demo2.identity.controller;
 
+import com.example.demo2.identity.controller.docs.AuthApiDocs;
 import com.example.demo2.identity.dto.AuthResponse;
 import com.example.demo2.identity.dto.LoginRequest;
 import com.example.demo2.identity.dto.RegisterRequest;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthApiDocs {
 
     private final AuthService authService;
 

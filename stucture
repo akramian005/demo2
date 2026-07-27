@@ -1,31 +1,22 @@
+demo2/com.example.demo2/src/main/java/demo2
 
-com.example.demo2
-banking
+account
 .	application
-.	.	command
-.	.	.	TransferMoneyCommand
 .	.	listener
 .	.	.	BankingUserRegisteredListener
-.	.	result
-.	.	.	MoneyTransferResult
 .	.	service
 .	.	.	AccountQueryService
 .	.	.	IbanGenerationService
-.	.	.	MoneyTransferService
 .	.	.	OpenAccountService
 .	domain
 .	.	exception
 .	.	.	AccountNotActiveException
-.	.	.	CardNotUsableException
-.	.	.	CurrencyMismatchException
 .	.	.	InsufficientFundsException
 .	.	.	InvalidAmountException
 .	.	model
 .	.	.	AccountStatus
 .	.	.	BankAccount
-.	.	.	CardStatus
 .	.	.	Iban
-.	.	.	PaymentCard
 .	.	repository
 .	.	.	BankAccountRepository
 .	infrastructure.persistence
@@ -34,14 +25,26 @@ banking
 .	.	BankAccountRepositoryImpl
 .	presentation
 .	.	controller
-.	.	.	BankController
+.   .   AccountController
 .	.	dto
 .	.	.	AccountCheckResponse
 .	.	.	AccountResponse
-.	.	.	MoneyTransferRequest
-.	.	.	MoneyTransferResponse
+.   .   mapper
+.   .   .   AccountDtoMapper
+card
+.	domain
+.	.	exception
+.	.	.	CardNotUsableException
+.	.	.	CurrencyMismatchException
+
+.	.	model
+.	.	.	CardStatus
+.	.	.	PaymentCard
+
 identity
 .	controller
+.   .   docs
+.   .   .   AuthApiDocs
 .	.	AuthController
 .	dto
 .	.	AuthResponse
@@ -56,14 +59,6 @@ identity
 .	.	AuthService
 .	.	CustomUserDetailService
 .	.	UserQueryService
-shared
-.	event
-.	.	UserRegisteredEvent
-.	security
-.	.	filter
-.	.	.	JwtFilter
-.	.	JwtService
-.	.	SecurityConfig
 shop
 .	controller
 .	.	CartController
@@ -106,4 +101,31 @@ shop
 .	.	CategoryService
 .	.	OrderService
 .	.	ProductService
+payment
+shared
+.	event
+.	.	UserRegisteredEvent
+.	security
+.	.	filter
+.	.	.	JwtFilter
+.	.	JwtService
+.	.	SecurityConfig
+transaction
+.	application
+.	.	command
+.	.	.	TransferMoneyCommand
+.	.	result
+.	.	.	MoneyTransferResult
+.	.	service
+.	.	.	MoneyTransferService
+.	presentation
+.   .   docs
+.   .   .
+.	.	controller
+.	.	.	TransferController
+.	.	dto
+.	.	.	MoneyTransferRequest
+.	.	.	MoneyTransferResponse
+.   .   mapper
+.   .   .   TransactionDtoMapper
 Demo2Application
