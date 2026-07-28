@@ -1,4 +1,4 @@
-package com.example.demo2.shop.initializer;
+package com.example.demo2.identity.initializer;
 
 import com.example.demo2.identity.entity.Role;
 import com.example.demo2.identity.entity.User;

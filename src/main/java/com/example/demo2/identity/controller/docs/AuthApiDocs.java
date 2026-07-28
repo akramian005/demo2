@@ -18,6 +18,7 @@ public interface AuthApiDocs {
 
     @Operation(summary = "Регистрация нового пользователя",
             description = "Создаёт нового пользователя и возвращает JWT-токен. " +
+                    "Обязательны email и пароль. Имя, фамилия и телефон можно передать сразу, но они необязательны. " +
                     "После регистрации автоматически публикуется событие UserRegisteredEvent, " +
                     "по которому создаются связанные сущности в других модулях (аккаунт, корзина и т.д.)")
     @ApiResponses({
@@ -27,8 +28,7 @@ public interface AuthApiDocs {
                                     {
                                       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                                       "email": "user@example.com",
-                                      "firstName": "Иван",
-                                      "lastName": "Петров"
+                                      "role": "USER"
                                     }
                                     """))),
             @ApiResponse(responseCode = "400", description = "Ошибка валидации (некорректный email, короткий пароль)",
@@ -51,8 +51,7 @@ public interface AuthApiDocs {
                                     {
                                       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                                       "email": "user@example.com",
-                                      "firstName": "Иван",
-                                      "lastName": "Петров"
+                                      "role": "USER"
                                     }
                                     """))),
             @ApiResponse(responseCode = "401", description = "Неверный email или пароль")

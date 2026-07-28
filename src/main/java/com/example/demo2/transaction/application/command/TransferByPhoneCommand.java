@@ -2,9 +2,9 @@ package com.example.demo2.transaction.application.command;
 
 import java.math.BigDecimal;
 
-public record TransferMoneyCommand(
+public record TransferByPhoneCommand(
         String fromIban,
-        String toIban,
+        String targetPhone,
         BigDecimal amount,
         String currency
 ) {

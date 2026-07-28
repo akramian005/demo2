@@ -136,3 +136,30 @@ http://localhost:8080/api/orders/1/status
 
 GET
 http://localhost:8080/api/orders/all
+
+============================================
+
+http://localhost:8080/api/transfers/iban
+
+{
+  "fromIban": "KG12000100000000000001",
+  "toIban": "KG12000100000000000002",
+  "amount": 250.50,
+  "currency": "KGS"
+}
+
+http://localhost:8080/api/transfers/phone
+{
+  "fromIban": "KG3312340000000000000001",
+  "targetPhone": "+996509295539",
+  "amount": 250.50,
+  "currency": "KGS"
+}
+
+/api/transfers/card
+{
+  "fromIban": "KG54DEMO0000000000000001",
+  "targetPan": "1234567812345678",
+  "amount": 100.00,
+  "currency": "KGS"
+}

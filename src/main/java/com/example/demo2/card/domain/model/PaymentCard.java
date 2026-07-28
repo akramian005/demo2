@@ -7,33 +7,46 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 
 @Entity
 @Table(name = "payment_cards")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // только для JPA
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaymentCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Храним только маскированный номер, полный PAN не персистим (PCI DSS).
-    // В реальной системе полный номер живёт у платёжного процессора/токенизатора,
-    // здесь для учебного проекта храним только последние 4 цифры.
+    /**
+     * Полный номер карты (PAN).
+     *
+     * Учебный проект:
+     * хранится в открытом виде для реализации переводов по номеру карты.
+     *
+     * В реальной банковской системе PAN хранится в зашифрованном виде
+     * либо вынесен в отдельное защищённое хранилище.
+     */
+    @Column(nullable = false, unique = true, length = 16)
+    private String pan;
+
+    /**
+     * Последние четыре цифры карты для отображения.
+     */
     @Column(name = "last_four_digits", nullable = false, length = 4)
     private String lastFourDigits;
 
     @Column(nullable = false, length = 100)
     private String cardholderName;
 
+    /**
+     * Срок действия карты.
+     * Хранится только месяц и год.
+     */
     @Column(name = "expiration_date", nullable = false)
-    private LocalDate expirationDate;
-
-    // CVV НЕ хранится вообще — ни в открытом виде, ни в хэше.
-    // Он проверяется только в момент авторизации операции и никогда не сохраняется в БД.
+    private YearMonth expirationDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -46,7 +59,13 @@ public class PaymentCard {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    private PaymentCard(String lastFourDigits, String cardholderName, LocalDate expirationDate) {
+    private PaymentCard(
+            String pan,
+            String lastFourDigits,
+            String cardholderName,
+            YearMonth expirationDate
+    ) {
+        this.pan = pan;
         this.lastFourDigits = lastFourDigits;
         this.cardholderName = cardholderName;
         this.expirationDate = expirationDate;
@@ -54,39 +73,45 @@ public class PaymentCard {
         this.createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Выпуск новой карты. Полный номер карты генерируется/выдаётся инфраструктурой
-     * (платёжным процессором) и сюда не попадает — только последние 4 цифры для отображения.
-     */
-    public static PaymentCard issue(String fullCardNumber, String cardholderName, LocalDate expirationDate) {
-        if (fullCardNumber == null || !fullCardNumber.matches("\\d{16}")) {
+    public static PaymentCard issue(
+            String pan,
+            String cardholderName,
+            YearMonth expirationDate
+    ) {
+
+        if (pan == null || !pan.matches("\\d{16}")) {
             throw new IllegalArgumentException("Номер карты должен состоять ровно из 16 цифр");
         }
+
         if (cardholderName == null || cardholderName.isBlank()) {
             throw new IllegalArgumentException("Имя держателя карты обязательно");
         }
-        if (expirationDate == null || expirationDate.isBefore(LocalDate.now())) {
+
+        if (expirationDate == null || expirationDate.isBefore(YearMonth.now())) {
             throw new IllegalArgumentException("Некорректный срок действия карты");
         }
-        String lastFour = fullCardNumber.substring(12);
-        return new PaymentCard(lastFour, cardholderName, expirationDate);
+
+        String lastFour = pan.substring(12);
+
+        return new PaymentCard(
+                pan,
+                lastFour,
+                cardholderName,
+                expirationDate
+        );
     }
 
-    /**
-     * Проверка, можно ли проводить операцию по карте.
-     */
     public boolean isUsable() {
-        return this.status == CardStatus.ACTIVE && !LocalDate.now().isAfter(this.expirationDate);
+        return status == CardStatus.ACTIVE
+                && !YearMonth.now().isAfter(expirationDate);
     }
 
-    /**
-     * Бросает исключение, если картой сейчас нельзя пользоваться —
-     * удобно вызывать перед списанием в application-слое.
-     */
     public void ensureUsable() {
         if (!isUsable()) {
-            throw new CardNotUsableException("Карта недоступна для операций. Статус: " + status
-                    + ", срок действия: " + expirationDate);
+            throw new CardNotUsableException(
+                    "Карта недоступна для операций. Статус: "
+                            + status + ", срок действия: " + expirationDate
+            );
         }
     }
 
@@ -95,24 +120,18 @@ public class PaymentCard {
     }
 
     public void activate() {
-        if (LocalDate.now().isAfter(this.expirationDate)) {
-            throw new IllegalStateException("Нельзя активировать карту с истёкшим сроком действия");
+        if (YearMonth.now().isAfter(expirationDate)) {
+            throw new IllegalStateException(
+                    "Нельзя активировать карту с истёкшим сроком действия");
         }
+
         this.status = CardStatus.ACTIVE;
     }
 
-    /**
-     * Маскированный номер для отображения в UI, например "**** **** **** 1111".
-     */
     public String getMaskedNumber() {
         return "**** **** **** " + lastFourDigits;
     }
 
-    /**
-     * Устанавливает владеющую сторону связи с BankAccount.
-     * Вызывается из BankAccount.linkCard() при выпуске/привязке карты к счёту —
-     * это единственная точка входа для установки этой связи.
-     */
     public void linkToAccount(BankAccount account) {
         this.account = account;
     }

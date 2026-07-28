@@ -4,7 +4,7 @@ import com.example.demo2.card.domain.model.PaymentCard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Random;
 
 @Service
@@ -12,16 +12,35 @@ import java.util.Random;
 public class CardIssuanceService {
 
     public PaymentCard issueCard(String cardholderName) {
-        String fullCardNumber = generateCardNumber();
-        return PaymentCard.issue(fullCardNumber, cardholderName, LocalDate.now().plusYears(4));
+
+        String pan = generatePan();
+
+        YearMonth expirationDate = YearMonth.now().plusYears(4);
+
+        return PaymentCard.issue(
+                pan,
+                cardholderName,
+                expirationDate
+        );
     }
 
-    private String generateCardNumber() {
+    /**
+     * Генерирует PAN (Primary Account Number).
+     *
+     * Для учебного проекта используется случайная генерация.
+     * В реальном банке PAN генерируется карточным процессингом
+     * с использованием BIN/IIN и алгоритма Луна.
+     */
+    private String generatePan() {
+
         Random random = new Random();
-        StringBuilder sb = new StringBuilder();
+
+        StringBuilder pan = new StringBuilder();
+
         for (int i = 0; i < 16; i++) {
-            sb.append(random.nextInt(10));
+            pan.append(random.nextInt(10));
         }
-        return sb.toString();
+
+        return pan.toString();
     }
 }

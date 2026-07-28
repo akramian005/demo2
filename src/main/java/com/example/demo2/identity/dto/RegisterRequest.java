@@ -17,6 +17,8 @@ public class RegisterRequest {
 
     private String lastName;
 
+    private String phone;
+
     @NotBlank(message = "Email обязателен")
     @Email(message = "Некорректный формат email")
     private String email;

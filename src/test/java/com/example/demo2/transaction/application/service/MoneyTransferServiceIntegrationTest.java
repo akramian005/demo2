@@ -1,7 +1,9 @@
 package com.example.demo2.transaction.application.service;
 
 import com.example.demo2.account.application.service.OpenAccountService;
-import com.example.demo2.transaction.application.command.TransferMoneyCommand;
+import com.example.demo2.transaction.application.command.TransferByIbanCommand;
+import com.example.demo2.transaction.application.command.TransferByCardCommand;
+import com.example.demo2.transaction.application.command.TransferByPhoneCommand;
 import com.example.demo2.account.domain.model.BankAccount;
 import com.example.demo2.account.domain.repository.BankAccountRepository;
 import com.example.demo2.identity.entity.Role;
@@ -26,6 +28,12 @@ class MoneyTransferServiceIntegrationTest {
     private MoneyTransferService moneyTransferService;
 
     @Autowired
+    private TransferByPhoneService transferByPhoneService;
+
+    @Autowired
+    private TransferByCardService transferByCardService;
+
+    @Autowired
     private OpenAccountService openAccountService;
 
     @Autowired
@@ -46,7 +54,7 @@ class MoneyTransferServiceIntegrationTest {
         senderAccount.credit(new BigDecimal("100.00"), "KGS");
         accountRepository.save(senderAccount);
 
-        TransferMoneyCommand command = transferCommand(
+        TransferByIbanCommand command = transferCommand(
                 senderAccount.getIban(),
                 receiverAccount.getIban(),
                 "25.50",
@@ -70,7 +78,7 @@ class MoneyTransferServiceIntegrationTest {
         BankAccount ownerAccount = openAccountService.open(owner.getId(), "KGS");
         BankAccount receiverAccount = openAccountService.open(receiver.getId(), "KGS");
 
-        TransferMoneyCommand command = transferCommand(
+        TransferByIbanCommand command = transferCommand(
                 ownerAccount.getIban(),
                 receiverAccount.getIban(),
                 "10.00",
@@ -80,6 +88,52 @@ class MoneyTransferServiceIntegrationTest {
         assertThatThrownBy(() -> moneyTransferService.transfer(attacker.getId(), command))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("403 FORBIDDEN");
+    }
+
+    @Test
+    void transferByPhoneMovesMoneyToReceiversCurrencyAccount() {
+        User sender = saveUser("sender");
+        User receiver = saveUser("receiver");
+        String receiverPhone = "+996" + String.valueOf(System.nanoTime()).substring(0, 9);
+        receiver.setPhone(receiverPhone);
+        userRepository.save(receiver);
+
+        BankAccount senderAccount = openAccountService.open(sender.getId(), "KGS");
+        BankAccount receiverAccount = openAccountService.open(receiver.getId(), "KGS");
+        senderAccount.credit(new BigDecimal("100.00"), "KGS");
+        accountRepository.save(senderAccount);
+
+        transferByPhoneService.transfer(
+                sender.getId(),
+                new TransferByPhoneCommand(senderAccount.getIban(), receiverPhone, new BigDecimal("15.00"), "KGS")
+        );
+
+        BankAccount updatedSender = accountRepository.findByIban(senderAccount.getIban()).orElseThrow();
+        BankAccount updatedReceiver = accountRepository.findByIban(receiverAccount.getIban()).orElseThrow();
+
+        assertThat(updatedSender.getBalance()).isEqualByComparingTo("85.00");
+        assertThat(updatedReceiver.getBalance()).isEqualByComparingTo("15.00");
+    }
+
+    @Test
+    void transferByCardMovesMoneyToCardAccount() {
+        User sender = saveUser("sender");
+        User receiver = saveUser("receiver");
+        BankAccount senderAccount = openAccountService.open(sender.getId(), "KGS");
+        BankAccount receiverAccount = openAccountService.open(receiver.getId(), "KGS");
+        senderAccount.credit(new BigDecimal("100.00"), "KGS");
+        accountRepository.save(senderAccount);
+
+        transferByCardService.transfer(
+                sender.getId(),
+                new TransferByCardCommand(senderAccount.getIban(), receiverAccount.getCard().getPan(), new BigDecimal("20.00"), "KGS")
+        );
+
+        BankAccount updatedSender = accountRepository.findByIban(senderAccount.getIban()).orElseThrow();
+        BankAccount updatedReceiver = accountRepository.findByIban(receiverAccount.getIban()).orElseThrow();
+
+        assertThat(updatedSender.getBalance()).isEqualByComparingTo("80.00");
+        assertThat(updatedReceiver.getBalance()).isEqualByComparingTo("20.00");
     }
 
     private User saveUser(String prefix) {
@@ -92,7 +146,7 @@ class MoneyTransferServiceIntegrationTest {
         return userRepository.save(user);
     }
 
-    private TransferMoneyCommand transferCommand(String fromIban, String toIban, String amount, String currency) {
-        return new TransferMoneyCommand(fromIban, toIban, new BigDecimal(amount), currency);
+    private TransferByIbanCommand transferCommand(String fromIban, String toIban, String amount, String currency) {
+        return new TransferByIbanCommand(fromIban, toIban, new BigDecimal(amount), currency);
     }
 }

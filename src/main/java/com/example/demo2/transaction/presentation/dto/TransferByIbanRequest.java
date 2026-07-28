@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class MoneyTransferRequest {
+public class TransferByIbanRequest {
 
     @NotBlank(message = "IBAN отправителя обязателен")
     private String fromIban;

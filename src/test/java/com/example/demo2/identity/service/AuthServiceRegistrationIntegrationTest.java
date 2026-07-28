@@ -31,7 +31,7 @@ class AuthServiceRegistrationIntegrationTest {
     void registerCreatesCustomerAndBankAccount() {
         String email = "listener-" + UUID.randomUUID() + "@example.com";
 
-        authService.register(new RegisterRequest("Test", "User", email, "password123"));
+        authService.register(new RegisterRequest("Test", "User", "+996700111222", email, "password123"));
 
         var user = userRepository.findByEmail(email).orElseThrow();
 

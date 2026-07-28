@@ -2,8 +2,8 @@ package com.example.demo2.transaction.presentation.controller.docs;
 
 import com.example.demo2.account.presentation.dto.AccountCheckResponse;
 import com.example.demo2.account.presentation.dto.AccountResponse;
-import com.example.demo2.transaction.presentation.dto.MoneyTransferRequest;
 import com.example.demo2.transaction.presentation.dto.MoneyTransferResponse;
+import com.example.demo2.transaction.presentation.dto.TransferByIbanRequest;
 import com.example.demo2.identity.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -58,6 +58,6 @@ public interface BankingApiDocs {
     })
     ResponseEntity<MoneyTransferResponse> transfer(
             @AuthenticationPrincipal User user,
-            @Valid MoneyTransferRequest request
+            @Valid TransferByIbanRequest request
     );
 }
