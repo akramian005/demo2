@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Регистрация</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<main class="auth-page">
+    <section class="auth-card">
+        <h1>Регистрация</h1>
+        <p class="auth-subtitle">Создайте аккаунт. Имя, фамилия и телефон необязательны.</p>
+
+        <form id="register-form" class="auth-form">
+            <label>
+                Email
+                <input name="email" type="email" autocomplete="email" required>
+            </label>
+
+            <label>
+                Пароль
+                <input name="password" type="password" autocomplete="new-password" minlength="8" required>
+            </label>
+
+            <label>
+                Имя
+                <input name="firstName" type="text" autocomplete="given-name">
+            </label>
+
+            <label>
+                Фамилия
+                <input name="lastName" type="text" autocomplete="family-name">
+            </label>
+
+            <label>
+                Телефон
+                <input name="phone" type="tel" autocomplete="tel" placeholder="+996700111222">
+            </label>
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+        <p id="message" class="message" aria-live="polite"></p>
+        <p class="auth-link">Уже есть аккаунт? <a th:href="@{/login}">Войти</a></p>
+    </section>
+</main>
+<script th:src="@{/js/auth.js}"></script>
+</body>
+</html>
