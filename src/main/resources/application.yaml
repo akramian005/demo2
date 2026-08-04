@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demo2
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+security:
+  jwt:
+    secret: 9a4f43db64d12c3a59a721759f2142e5a61e7c5b621e25e4d262d46a81e3a2c5
+    expiration-ms: 86400000
+
+app:
+  admin:
+    email: admin@example.com
+    password: admin12345
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+  show-actuator: false
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.schema: DEBUG

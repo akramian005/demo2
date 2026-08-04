@@ -23,17 +23,17 @@ public class MoneyTransferService {
         String toIban = normalizeIban(command.toIban());
         String currency = command.currency().trim().toUpperCase();
 
-        BankAccount fromAccount = accountRepository.findByIbanForUpdate(fromIban)
+        BankAccount sourceAccount = accountRepository.findByIbanForUpdate(fromIban)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт отправителя не найден"));
 
-        if (!fromAccount.getUserId().equals(currentUserId)) {
+        if (!sourceAccount.getUserId().equals(currentUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя переводить деньги с чужого счёта");
         }
 
-        BankAccount toAccount = accountRepository.findByIbanForUpdate(toIban)
+        BankAccount destinationAccount = accountRepository.findByIbanForUpdate(toIban)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт получателя не найден"));
 
-        return transferExecutionService.transfer(fromAccount, toAccount, command.amount(), currency);
+        return transferExecutionService.transfer(sourceAccount, destinationAccount, command.amount(), currency);
     }
 
     private String normalizeIban(String iban) {

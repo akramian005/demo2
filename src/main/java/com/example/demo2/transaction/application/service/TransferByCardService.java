@@ -27,10 +27,10 @@ public class TransferByCardService {
         String targetPan = normalizePan(command.targetPan());
         String currency = command.currency().trim().toUpperCase();
 
-        BankAccount fromAccount = accountRepository.findByIbanForUpdate(fromIban)
+        BankAccount sourceAccount = accountRepository.findByIbanForUpdate(fromIban)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт отправителя не найден"));
 
-        if (!fromAccount.getUserId().equals(currentUserId)) {
+        if (!sourceAccount.getUserId().equals(currentUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя переводить деньги с чужого счёта");
         }
 
@@ -42,10 +42,10 @@ public class TransferByCardService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
 
-        BankAccount toAccount = accountRepository.findByIbanForUpdate(targetCard.getAccount().getIban())
+        BankAccount destinationAccount = accountRepository.findByIbanForUpdate(targetCard.getAccount().getIban())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт карты получателя не найден"));
 
-        return transferExecutionService.transfer(fromAccount, toAccount, command.amount(), currency);
+        return transferExecutionService.transfer(sourceAccount, destinationAccount, command.amount(), currency);
     }
 
     private String normalizeIban(String iban) {

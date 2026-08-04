@@ -6,6 +6,9 @@ import com.example.demo2.account.domain.exception.InvalidAmountException;
 import com.example.demo2.account.domain.model.BankAccount;
 import com.example.demo2.card.domain.exception.CurrencyMismatchException;
 import com.example.demo2.transaction.application.result.MoneyTransferResult;
+import com.example.demo2.transaction.domain.model.PaymentTransaction;
+import com.example.demo2.transaction.domain.repository.PaymentTransactionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,27 +16,37 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class TransferExecutionService {
 
-    public MoneyTransferResult transfer(BankAccount fromAccount, BankAccount toAccount, BigDecimal amount, String currency) {
-        if (fromAccount.getIban().equals(toAccount.getIban())) {
+    private final PaymentTransactionRepository paymentTransactionRepository;
+
+    public MoneyTransferResult transfer(BankAccount sourceAccount, BankAccount destinationAccount, BigDecimal amount, String currency) {
+        if (sourceAccount.getIban().equals(destinationAccount.getIban())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя перевести деньги на тот же счёт");
         }
 
         try {
-            fromAccount.debit(amount, currency);
-            toAccount.credit(amount, currency);
+            sourceAccount.debit(amount, currency);
+            destinationAccount.credit(amount, currency);
         } catch (AccountNotActiveException | CurrencyMismatchException |
                  InsufficientFundsException | InvalidAmountException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
 
+        paymentTransactionRepository.save(PaymentTransaction.completedTransfer(
+                sourceAccount.getId(),
+                destinationAccount.getId(),
+                amount,
+                currency
+        ));
+
         return new MoneyTransferResult(
-                fromAccount.getIban(),
-                toAccount.getIban(),
+                sourceAccount.getIban(),
+                destinationAccount.getIban(),
                 amount,
                 currency,
-                fromAccount.getBalance()
+                sourceAccount.getBalance()
         );
     }
 }

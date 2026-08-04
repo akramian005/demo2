@@ -26,23 +26,23 @@ public class TransferByPhoneService {
         String targetPhone = normalizePhone(command.targetPhone());
         String currency = command.currency().trim().toUpperCase();
 
-        BankAccount fromAccount = accountRepository.findByIbanForUpdate(fromIban)
+        BankAccount sourceAccount = accountRepository.findByIbanForUpdate(fromIban)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт отправителя не найден"));
 
-        if (!fromAccount.getUserId().equals(currentUserId)) {
+        if (!sourceAccount.getUserId().equals(currentUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя переводить деньги с чужого счёта");
         }
 
         User receiver = userRepository.findByPhone(targetPhone)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Получатель с таким телефоном не найден"));
 
-        BankAccount toAccount = accountRepository.findAllByUserId(receiver.getId()).stream()
+        BankAccount destinationAccount = accountRepository.findAllByUserId(receiver.getId()).stream()
                 .filter(account -> account.getCurrency().equals(currency))
                 .findFirst()
                 .map(account -> accountRepository.findByIbanForUpdate(account.getIban()).orElseThrow())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт получателя в указанной валюте не найден"));
 
-        return transferExecutionService.transfer(fromAccount, toAccount, command.amount(), currency);
+        return transferExecutionService.transfer(sourceAccount, destinationAccount, command.amount(), currency);
     }
 
     private String normalizeIban(String iban) {
