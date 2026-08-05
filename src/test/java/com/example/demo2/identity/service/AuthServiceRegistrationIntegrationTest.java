@@ -1,6 +1,6 @@
 package com.example.demo2.identity.service;
 
-import com.example.demo2.account.domain.repository.BankAccountRepository;
+import com.example.demo2.payment.repository.BankAccountRepository;
 import com.example.demo2.identity.dto.RegisterRequest;
 import com.example.demo2.identity.repository.UserRepository;
 import com.example.demo2.shop.repository.CustomerRepository;

@@ -1,11 +1,14 @@
 package com.example.demo2.transaction.application.service;
 
-import com.example.demo2.account.application.service.OpenAccountService;
-import com.example.demo2.transaction.application.command.TransferByIbanCommand;
-import com.example.demo2.transaction.application.command.TransferByCardCommand;
-import com.example.demo2.transaction.application.command.TransferByPhoneCommand;
-import com.example.demo2.account.domain.model.BankAccount;
-import com.example.demo2.account.domain.repository.BankAccountRepository;
+import com.example.demo2.payment.service.MoneyTransferService;
+import com.example.demo2.payment.service.OpenAccountService;
+import com.example.demo2.payment.service.TransferByCardService;
+import com.example.demo2.payment.service.TransferByPhoneService;
+import com.example.demo2.payment.dto.TransferByIbanCommand;
+import com.example.demo2.payment.dto.TransferByCardCommand;
+import com.example.demo2.payment.dto.TransferByPhoneCommand;
+import com.example.demo2.payment.model.entity.BankAccount;
+import com.example.demo2.payment.repository.BankAccountRepository;
 import com.example.demo2.identity.entity.Role;
 import com.example.demo2.identity.entity.User;
 import com.example.demo2.identity.repository.UserRepository;
