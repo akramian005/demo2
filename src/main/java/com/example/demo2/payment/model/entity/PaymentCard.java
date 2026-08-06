@@ -56,6 +56,10 @@ public class PaymentCard {
     @JoinColumn(name = "account_id", unique = true, nullable = false)
     private BankAccount account;
 
+    public void linkToAccount(BankAccount account) {
+        this.account = account;
+    }
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -132,7 +136,5 @@ public class PaymentCard {
 //        return "**** **** **** " + lastFourDigits;
 //    }
 
-    public void linkToAccount(BankAccount account) {
-        this.account = account;
-    }
+
 }

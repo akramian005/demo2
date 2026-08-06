@@ -1,5 +1,8 @@
 package com.example.demo2.payment.model.entity;
 
+import com.example.demo2.payment.exception.AccountNotActiveException;
+import com.example.demo2.payment.exception.CurrencyMismatchException;
+import com.example.demo2.payment.exception.InvalidAmountException;
 import com.example.demo2.payment.model.enums.AccountStatus;
 import com.example.demo2.payment.exception.InsufficientFundsException;
 import jakarta.persistence.*;
@@ -21,27 +24,41 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
     @Column(name = "account_number", unique = true, nullable = false, length = 20)
     private String accountNumber;
 
     @Column(unique = true, nullable = false, length = 34)
     private String iban;
 
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal balance;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(nullable = false, length = 3)
     private String currency;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AccountStatus status;
 
+//            +-----------------+              +-------------------+
+//            | bank_accounts   |              | payment_cards     |
+//            +-----------------+              +-------------------+
+//            | id (PK)         |◄─────────────| account_id (FK)   |
+//            |                 |              | id (PK)           |
+//            +-----------------+              +-------------------+
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private PaymentCard card;
+
+//          BankAccount ------> PaymentCard
+//            ▲                  │
+//            └──────────────────┘
+    public void linkCard(PaymentCard card) {
+        this.card = card;
+        card.linkToAccount(this);
+    }
 
     @Version
     private Long version;
@@ -51,8 +68,6 @@ public class BankAccount {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-
 
     private BankAccount(Long userId, String accountNumber, String iban, String currency) {
         this.userId = userId;
@@ -93,11 +108,11 @@ public class BankAccount {
         this.balance = this.balance.subtract(normalized);
     }
 
-//    public void credit(BigDecimal amount, String amountCurrency) {
-//        checkAccountIsActive();
-//        BigDecimal normalized = validateAndNormalize(amount, amountCurrency);
-//        this.balance = this.balance.add(normalized);
-//    }
+    public void credit(BigDecimal amount, String amountCurrency) {
+        checkAccountIsActive();
+        BigDecimal normalized = validateAndNormalize(amount, amountCurrency);
+        this.balance = this.balance.add(normalized);
+    }
 
 //    public void freeze() {
 //        if (this.status == AccountStatus.CLOSED) {
@@ -113,11 +128,6 @@ public class BankAccount {
 //        this.status = AccountStatus.ACTIVE;
 //    }
 
-    /**
-     * Закрытие счёта. Баланс должен быть РОВНО нулевым — как положительный
-     * (клиент не забрал деньги), так и отрицательный (технический овердрафт/долг)
-     * баланс не позволяет закрыть счёт.
-     */
 //    public void close() {
 //        if (this.balance.compareTo(BigDecimal.ZERO) != 0) {
 //            throw new IllegalStateException("Нельзя закрыть счёт с ненулевым балансом ("
@@ -126,26 +136,21 @@ public class BankAccount {
 //        this.status = AccountStatus.CLOSED;
 //    }
 
-    public void linkCard(PaymentCard card) {
-        this.card = card;
-        card.linkToAccount(this);
+    private void checkAccountIsActive() {
+        if (this.status != AccountStatus.ACTIVE) {
+            throw new AccountNotActiveException(
+                    "Операция отклонена. Счёт находится в статусе: " + this.status);
+        }
     }
 
-//    private void checkAccountIsActive() {
-//        if (this.status != AccountStatus.ACTIVE) {
-//            throw new AccountNotActiveException(
-//                    "Операция отклонена. Счёт находится в статусе: " + this.status);
-//        }
-//    }
-
-//    private BigDecimal validateAndNormalize(BigDecimal amount, String amountCurrency) {
-//        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-//            throw new InvalidAmountException("Сумма транзакции должна быть строго больше нуля");
-//        }
-//        if (amountCurrency != null && !amountCurrency.equals(this.currency)) {
-//            throw new CurrencyMismatchException(
-//                    "Валюта операции (" + amountCurrency + ") не совпадает с валютой счёта (" + this.currency + ")");
-//        }
-//        return amount.setScale(2, RoundingMode.HALF_UP);
-//    }
+    private BigDecimal validateAndNormalize(BigDecimal amount, String amountCurrency) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("Сумма транзакции должна быть строго больше нуля");
+        }
+        if (amountCurrency != null && !amountCurrency.equals(this.currency)) {
+            throw new CurrencyMismatchException(
+                    "Валюта операции (" + amountCurrency + ") не совпадает с валютой счёта (" + this.currency + ")");
+        }
+        return amount.setScale(2, RoundingMode.HALF_UP);
+    }
 }

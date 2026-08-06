@@ -1,14 +1,12 @@
 package com.example.demo2.payment.repository;
 
 import com.example.demo2.payment.model.entity.PaymentCard;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-@Repository
-public interface PaymentCardRepository {
-
-    PaymentCard save(PaymentCard card);
+public interface PaymentCardRepository extends JpaRepository<PaymentCard, Long> {
 
     Optional<PaymentCard> findByPan(String pan);
+
 }

@@ -1,35 +1,22 @@
 package com.example.demo2.payment.repository;
 
 import com.example.demo2.payment.model.entity.BankAccount;
-import org.springframework.stereotype.Repository;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Порт (интерфейс) для доступа к BankAccount.
- * Реализация (адаптер) находится в banking.infrastructure — там же,
- * где Spring Data JPA. Сам интерфейс не зависит ни от Spring, ни от JPA,
- * чтобы domain-слой оставался "чистой Java".
- */
-@Repository
-public interface BankAccountRepository {
+public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
 
-    BankAccount save(BankAccount account);
 
-    Optional<BankAccount> findById(Long id);
-
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<BankAccount> findByIban(String iban);
-
-    Optional<BankAccount> findByIbanForUpdate(String iban);
-
-    Optional<BankAccount> findByAccountNumber(String accountNumber);
 
     List<BankAccount> findAllByUserId(Long userId);
 
     boolean existsByAccountNumber(String accountNumber);
 
     boolean existsByIban(String iban);
-
-    long count();
 }

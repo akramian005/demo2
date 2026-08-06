@@ -1,11 +1,11 @@
 package com.example.demo2.payment.service;
 
-import com.example.demo2.payment.model.entity.BankAccount;
-import com.example.demo2.payment.repository.BankAccountRepository;
 import com.example.demo2.identity.entity.User;
 import com.example.demo2.identity.repository.UserRepository;
-import com.example.demo2.payment.dto.TransferByPhoneCommand;
 import com.example.demo2.payment.dto.MoneyTransferResult;
+import com.example.demo2.payment.dto.TransferByPhoneRequest;
+import com.example.demo2.payment.model.entity.BankAccount;
+import com.example.demo2.payment.repository.BankAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ public class TransferByPhoneService {
     private final TransferExecutionService transferExecutionService;
 
     @Transactional
-    public MoneyTransferResult transfer(Long currentUserId, TransferByPhoneCommand command) {
-        String fromIban = normalizeIban(command.fromIban());
-        String targetPhone = normalizePhone(command.targetPhone());
-        String currency = command.currency().trim().toUpperCase();
+    public MoneyTransferResult transfer(Long currentUserId, TransferByPhoneRequest request) {
+        String fromIban = normalizeIban(request.getFromIban());
+        String targetPhone = normalizePhone(request.getTargetPhone());
+        String currency = request.getCurrency().trim().toUpperCase();
 
-        BankAccount sourceAccount = accountRepository.findByIbanForUpdate(fromIban)
+        BankAccount sourceAccount = accountRepository.findByIban(fromIban)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт отправителя не найден"));
 
         if (!sourceAccount.getUserId().equals(currentUserId)) {
@@ -39,10 +39,15 @@ public class TransferByPhoneService {
         BankAccount destinationAccount = accountRepository.findAllByUserId(receiver.getId()).stream()
                 .filter(account -> account.getCurrency().equals(currency))
                 .findFirst()
-                .map(account -> accountRepository.findByIbanForUpdate(account.getIban()).orElseThrow())
+                .map(account -> accountRepository.findByIban(account.getIban()).orElseThrow())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счёт получателя в указанной валюте не найден"));
 
-        return transferExecutionService.transfer(sourceAccount, destinationAccount, command.amount(), currency);
+        return transferExecutionService.transfer(
+                sourceAccount,
+                destinationAccount,
+                request.getAmount(),
+                currency
+        );
     }
 
     private String normalizeIban(String iban) {

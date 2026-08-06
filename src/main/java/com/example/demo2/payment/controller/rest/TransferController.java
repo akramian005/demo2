@@ -1,15 +1,15 @@
 package com.example.demo2.payment.controller.rest;
 
-import com.example.demo2.payment.dto.MoneyTransferResult;
-import com.example.demo2.payment.service.MoneyTransferService;
-import com.example.demo2.payment.service.TransferByCardService;
-import com.example.demo2.payment.service.TransferByPhoneService;
+import com.example.demo2.identity.entity.User;
 import com.example.demo2.payment.dto.MoneyTransferResponse;
+import com.example.demo2.payment.dto.MoneyTransferResult;
 import com.example.demo2.payment.dto.TransferByCardRequest;
 import com.example.demo2.payment.dto.TransferByIbanRequest;
 import com.example.demo2.payment.dto.TransferByPhoneRequest;
 import com.example.demo2.payment.mapper.TransactionDtoMapper;
-import com.example.demo2.identity.entity.User;
+import com.example.demo2.payment.service.TransferByIbanService;
+import com.example.demo2.payment.service.TransferByCardService;
+import com.example.demo2.payment.service.TransferByPhoneService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TransferController {
 
-    private final MoneyTransferService moneyTransferService;
+    private final TransferByIbanService moneyTransferService;
     private final TransferByPhoneService transferByPhoneService;
     private final TransferByCardService transferByCardService;
     private final TransactionDtoMapper mapper;
@@ -33,8 +33,9 @@ public class TransferController {
     ) {
         MoneyTransferResult result = moneyTransferService.transfer(
                 user.getId(),
-                mapper.toCommand(request)
+                request
         );
+
         return ResponseEntity.ok(mapper.toResponse(result));
     }
 
@@ -45,8 +46,9 @@ public class TransferController {
     ) {
         MoneyTransferResult result = transferByPhoneService.transfer(
                 user.getId(),
-                mapper.toCommand(request)
+                request
         );
+
         return ResponseEntity.ok(mapper.toResponse(result));
     }
 
@@ -57,8 +59,9 @@ public class TransferController {
     ) {
         MoneyTransferResult result = transferByCardService.transfer(
                 user.getId(),
-                mapper.toCommand(request)
+                request
         );
+
         return ResponseEntity.ok(mapper.toResponse(result));
     }
 }

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentTransactionStatus {
-    PROCESSING,
+//    PROCESSING,
     SUCCESS,
     FAILED;
 
